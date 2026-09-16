@@ -121,14 +121,14 @@ def create_conference_report():
     
     configure_document(doc, "", justify=True, font_size=10)
 
-    # Authors Table for 3 authors (2 columns, 2 rows)
-    table_authors = doc.add_table(rows=2, cols=2)
+    # Authors Table for 3 authors (3 columns, 1 row)
+    table_authors = doc.add_table(rows=1, cols=3)
     table_authors.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
     authors_data = [
         ("Snehal Dixit", 0, 0),
         ("Pratyasha Singh", 0, 1),
-        ("Dr. Pravindra Shekhar\n(Faculty Guide)", 1, 0)
+        ("Dr. Pravindra Shekhar\n(Faculty Guide)", 0, 2)
     ]
     
     for name, row, col in authors_data:
@@ -460,7 +460,7 @@ def create_conference_report():
     doc.add_paragraph("[3] K. Nakagawa et al., \"Real-time Posture Assessment using Computer Vision,\" IEEE Access, vol. 8, pp. 12040-12052, 2020.")
     doc.add_paragraph("[4] A. Smith, J. Doe, \"Ergonomic Posture Monitoring in Workplace Environments,\" Journal of Occupational Health, vol. 62, no. 1, 2020.")
 
-    doc.save(DOCS_DIR / "CONFERENCE_REPORT_v4.docx")
+    doc.save(DOCS_DIR / "CONFERENCE_REPORT_v5.docx")
 
 def create_project_thesis():
     doc = Document()
@@ -600,7 +600,7 @@ def create_project_thesis():
         "to geometric analysis and actionable UI feedback."
     )
 
-    doc.save(DOCS_DIR / "PROJECT_THESIS_v4.docx")
+    doc.save(DOCS_DIR / "PROJECT_THESIS_v5.docx")
 
 def main():
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
