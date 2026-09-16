@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A privacy-first posture monitor that runs MediaPipe Pose in your browser.">
+    <title>Posture Monitor</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Stay Upright.</h1>
+            <p>Private, real-time posture feedback in your browser.</p>
+        </header>
+        
+        <main>
+            <div class="video-wrapper">
+                <video id="input_video" style="display: none;" playsinline></video>
+                <canvas id="output_canvas" width="800" height="600" aria-label="Live camera view with posture landmarks">
+                    Your browser does not support the canvas element.
+                </canvas>
+
+                <div id="status-overlay" role="status" aria-live="polite">Waiting for camera...</div>
+
+                <button id="calibrate-btn" type="button" disabled>Calibrate posture</button>
+            </div>
+
+            <!-- Stats Dashboard -->
+            <div class="stats-dashboard">
+                <div class="stat-box">
+                    <span class="stat-label">Session Time</span>
+                    <span class="stat-value" id="session-time">00:00</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Slouch Count</span>
+                    <span class="stat-value" id="slouch-count">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Lean Count</span>
+                    <span class="stat-value" id="lean-count">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Calibration</span>
+                    <span class="stat-value" id="calibration-status" style="color: #ff3b30;">Pending</span>
+                </div>
+            </div>
+
+            <p class="privacy-note">Video is processed on this device and is not uploaded.</p>
+        </main>
+    </div>
+
+    <noscript>This application requires JavaScript for camera-based posture tracking.</noscript>
+    <script src="script.js"></script>
+</body>
+</html>
