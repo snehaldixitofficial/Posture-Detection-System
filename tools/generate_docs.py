@@ -2,6 +2,7 @@ from pathlib import Path
 from docx import Document
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.section import WD_SECTION
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
@@ -49,19 +50,20 @@ def set_table_borders(table):
         border.set(qn("w:sz"), "6")
         border.set(qn("w:color"), LIGHT_GRAY)
 
-def configure_document(doc, subtitle):
+def configure_document(doc, subtitle, justify=False, font_size=11):
     section = doc.sections[0]
     section.top_margin = Inches(0.75)
     section.bottom_margin = Inches(0.75)
-    section.left_margin = Inches(0.85)
-    section.right_margin = Inches(0.85)
+    section.left_margin = Inches(0.75)
+    section.right_margin = Inches(0.75)
 
     styles = doc.styles
     normal = styles["Normal"]
     normal.font.name = "Times New Roman"
-    normal.font.size = Pt(11)
+    normal.font.size = Pt(font_size)
     normal.paragraph_format.space_after = Pt(6)
-    normal.paragraph_format.line_spacing = 1.15
+    if justify:
+        normal.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
     title_style = styles["Title"]
     title_style.font.name = "Times New Roman"
@@ -73,12 +75,20 @@ def configure_document(doc, subtitle):
     if title_style_border is not None:
         title_style_properties.remove(title_style_border)
 
-    for name, size in (("Heading 1", 14), ("Heading 2", 12), ("Heading 3", 11)):
+    for name, size in (("Heading 1", 12), ("Heading 2", 10), ("Heading 3", 10)):
         if name in styles:
             style = styles[name]
             style.font.name = "Times New Roman"
             style.font.size = Pt(size)
-            style.font.bold = True
+            if name == "Heading 1":
+                style.font.bold = False
+                style.font.all_caps = True
+                style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            else:
+                style.font.bold = False
+                style.font.italic = True
+                style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
+
             style.font.color.rgb = RGBColor(0, 0, 0)
             style.paragraph_format.space_before = Pt(12)
             style.paragraph_format.space_after = Pt(6)
@@ -96,7 +106,7 @@ def configure_document(doc, subtitle):
         intro.alignment = WD_ALIGN_PARAGRAPH.CENTER
         run = intro.add_run(subtitle)
         run.italic = True
-        run.font.size = Pt(11)
+        run.font.size = Pt(font_size)
         intro.paragraph_format.space_after = Pt(16)
 
 def add_bullets(doc, items):
@@ -109,22 +119,37 @@ def create_conference_report():
     doc.core_properties.title = "AI BASED REAL TIME POSTURE DETECTION"
     doc.core_properties.subject = "Implementation and architecture review"
     
-    configure_document(doc, "")
+    configure_document(doc, "", justify=True, font_size=10)
 
-    # Authors
-    authors_para = doc.add_paragraph()
-    authors_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    authors_run = authors_para.add_run(
-        "Pratyasha Singh\n"
-        "School of Computing Science Engineering and Artificial Engineering\n"
-        "VIT Bhopal, Bhopal, India\n"
-        "pratyasha.25mip10119@vitbhopal.ac.in\n\n"
-        "Snehal Dixit\n"
-        "School of Computing Science Engineering and Artificial Engineering\n"
-        "VIT Bhopal, Bhopal, India\n"
-        "snehal.mip10072@vitbhopal.ac.in"
-    )
-    authors_run.font.size = Pt(12)
+    # Authors Table for 2 columns perfectly aligned
+    table_authors = doc.add_table(rows=1, cols=2)
+    table_authors.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    cell_1 = table_authors.rows[0].cells[0]
+    cell_2 = table_authors.rows[0].cells[1]
+
+    p1 = cell_1.paragraphs[0]
+    p1.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r1 = p1.add_run("Pratyasha Singh\n")
+    r1.font.size = Pt(11)
+    r1_it = p1.add_run("School of Computing Science Engineering\nand Artificial Engineering\nVIT Bhopal\nBhopal, India\npratyasha.25mip10119@vitbhopal.ac.in")
+    r1_it.font.size = Pt(11)
+    r1_it.italic = True
+
+    p2 = cell_2.paragraphs[0]
+    p2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r2 = p2.add_run("Snehal Dixit\n")
+    r2.font.size = Pt(11)
+    r2_it = p2.add_run("School of Computing Science Engineering\nand Artificial Engineering\nVIT Bhopal\nBhopal, India\nsnehal.mip10072@vitbhopal.ac.in")
+    r2_it.font.size = Pt(11)
+    r2_it.italic = True
+
+    doc.add_paragraph() # Spacing
+
+    # Section break for 2 columns
+    new_sect = doc.add_section(WD_SECTION.CONTINUOUS)
+    cols = new_sect._sectPr.xpath('./w:cols')[0]
+    cols.set(qn('w:num'), '2')
+    cols.set(qn('w:space'), '400') # ~0.25 inch space
 
     # Abstract
     p = doc.add_paragraph()
@@ -139,13 +164,15 @@ def create_conference_report():
         "features are calculated to estimate posture asymmetry and the relative distance between the face and shoulders. "
         "These measurements are compared with a calibrated upright-posture baseline to identify three posture conditions: "
         "upright posture, slouching, and lateral leaning. The application provides visual feedback, session tracking, and "
-        "event counters to improve users' awareness of their sitting posture. A landmark-visibility and geometric-validity "
+        "event counters to improve users’ awareness of their sitting posture. A landmark-visibility and geometric-validity "
         "verification stage is also incorporated to reduce unreliable predictions caused by incomplete or implausible upper-body "
         "detections. Since the system operates in the browser without transmitting camera frames to an application server, "
         "it offers a privacy-conscious and accessible approach to posture monitoring. The proposed system is intended as a "
         "posture-awareness aid rather than a medical diagnostic tool."
     )
     r2.bold = True
+    r2.font.size = Pt(9)
+    r.font.size = Pt(9)
 
     # Index Terms
     p_idx = doc.add_paragraph()
@@ -154,10 +181,11 @@ def create_conference_report():
     r_idx.italic = True
     r2_idx = p_idx.add_run("MediaPipe Pose, Computer Vision, Posture Monitoring, Pose Estimation, Geometric Features, Calibration, Real-Time Feedback, Human-Computer Interaction")
     r2_idx.bold = True
+    r2_idx.font.size = Pt(9)
+    r_idx.font.size = Pt(9)
 
     # Section I
-    h1 = doc.add_heading("I. INTRODUCTION", level=1)
-    h1.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_heading("I. INTRODUCTION", level=1)
     doc.add_paragraph(
         "Maintaining proper body posture is an important aspect of physical well-being, particularly for individuals who spend "
         "extended periods sitting while studying, working, or using digital devices. Prolonged sitting in an improper posture may "
@@ -176,11 +204,11 @@ def create_conference_report():
         "landmarks from camera input. The system evaluates posture using normalized geometric features derived from facial and "
         "shoulder landmarks. One feature measures left-right asymmetry between face-to-shoulder distances, while another evaluates "
         "the combined face-to-shoulder distance relative to shoulder width. These measurements are compared with a calibrated "
-        "upright-posture baseline to classify the user's posture."
+        "upright-posture baseline to classify the user’s posture."
     )
     doc.add_paragraph(
         "The proposed system provides feedback for three posture states: upright, slouching, and lateral leaning. It also includes "
-        "a calibration mechanism that adapts the baseline to the user's body proportions and camera position. To improve reliability, "
+        "a calibration mechanism that adapts the baseline to the user’s body proportions and camera position. To improve reliability, "
         "geometric validation checks are applied to reject incomplete or implausible upper-body detections. The application displays "
         "posture status, session duration, and posture-event counters through a responsive web interface."
     )
@@ -192,10 +220,9 @@ def create_conference_report():
     )
 
     # Section II
-    h2 = doc.add_heading("II. PROPOSED METHODOLOGY", level=1)
-    h2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_heading("II. PROPOSED METHODOLOGY", level=1)
     doc.add_paragraph(
-        "The proposed system is a camera-based posture monitoring application that uses computer vision to analyze the user's "
+        "The proposed system is a camera-based posture monitoring application that uses computer vision to analyze the user’s "
         "body posture. The system captures video through a camera, processes the input using a pose estimation framework, extracts "
         "relevant body landmarks, and evaluates posture using geometric relationships. A calibration mechanism establishes a reference "
         "posture, which is used to identify deviations during monitoring."
@@ -209,7 +236,7 @@ def create_conference_report():
     doc.add_heading("A. System Architecture", level=2)
     doc.add_paragraph(
         "The system architecture consists of five major components: camera input, pose estimation, geometric feature extraction, "
-        "posture assessment, and user feedback. The camera captures the user's upper-body posture. The pose estimation module "
+        "posture assessment, and user feedback. The camera captures the user’s upper-body posture. The pose estimation module "
         "identifies relevant landmarks, which are passed to the feature extraction stage. The extracted measurements are compared "
         "with a calibrated reference to determine the posture status. The result is then displayed through the user interface."
     )
@@ -220,7 +247,7 @@ def create_conference_report():
     if diagram_path.exists():
         p_img = doc.add_paragraph()
         p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img.add_run().add_picture(str(diagram_path), width=Inches(3.5))
+        p_img.add_run().add_picture(str(diagram_path), width=Inches(3.2))
         p_img2 = doc.add_paragraph("Fig. 1. Workflow of the proposed posture monitoring system.")
         p_img2.alignment = WD_ALIGN_PARAGRAPH.CENTER
     else:
@@ -240,30 +267,21 @@ def create_conference_report():
         "avoid making an invalid posture assessment."
     )
 
-    # Image 2
-    overlay_path = DOCS_DIR / "images" / "posture_overlay.jpg"
-    if overlay_path.exists():
-        p_img3 = doc.add_paragraph()
-        p_img3.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_img3.add_run().add_picture(str(overlay_path), width=Inches(4.5))
-        p_img4 = doc.add_paragraph("Fig. 2. Digital skeletal framework illustrating MediaPipe Pose landmark estimation.")
-        p_img4.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
     doc.add_heading("C. Geometric Feature Extraction", level=2)
     doc.add_paragraph(
         "After detecting the body landmarks, the system calculates geometric relationships between selected landmarks to repre"
-        "sent the user's posture. These relationships provide information about body alignment and deviations from the reference "
+        "sent the user’s posture. These relationships provide information about body alignment and deviations from the reference "
         "position."
     )
     doc.add_paragraph(
         "The extracted features are based on the relative positions of facial and shoulder landmarks. Using relative or normalized "
-        "measurements helps reduce the influence of changes in image scale and the user's distance from the camera. The resulting "
+        "measurements helps reduce the influence of changes in image scale and the user’s distance from the camera. The resulting "
         "features are used by the posture assessment logic to identify possible slouching or lateral leaning."
     )
 
     doc.add_heading("D. Calibration", level=2)
     doc.add_paragraph(
-        "The system includes a calibration stage to establish a reference for the user's upright posture. During calibration, "
+        "The system includes a calibration stage to establish a reference for the user’s upright posture. During calibration, "
         "the user is expected to sit in the desired upright position. The system records posture-related measurements from this "
         "reference position."
     )
@@ -288,7 +306,7 @@ def create_conference_report():
     doc.add_heading("F. Feedback and Monitoring", level=2)
     doc.add_paragraph(
         "The system presents the detected posture status through a user interface. This feedback is intended to improve the "
-        "user's awareness of posture deviations and encourage the maintenance of an upright sitting position."
+        "user’s awareness of posture deviations and encourage the maintenance of an upright sitting position."
     )
     doc.add_paragraph(
         "The monitoring interface may display posture status and session-related information depending on the implemented "
@@ -297,8 +315,7 @@ def create_conference_report():
     )
 
     # Section III
-    h3 = doc.add_heading("III. IMPLEMENTATION", level=1)
-    h3.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_heading("III. IMPLEMENTATION", level=1)
     doc.add_paragraph(
         "The proposed system is implemented as a browser-based application using web technologies and a computer vision "
         "pose estimation framework. The application integrates camera access, pose landmark detection, geometric feature processing, "
@@ -330,9 +347,17 @@ def create_conference_report():
             row.cells[0].paragraphs[0].runs[0].bold = True
             row.cells[1].paragraphs[0].runs[0].bold = True
 
+    # Image 2
+    overlay_path = DOCS_DIR / "images" / "posture_overlay.jpg"
+    if overlay_path.exists():
+        p_img3 = doc.add_paragraph()
+        p_img3.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img3.add_run().add_picture(str(overlay_path), width=Inches(3.2))
+        p_img4 = doc.add_paragraph("Fig. 2. Digital skeletal framework illustrating MediaPipe Pose landmark estimation.")
+        p_img4.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
     # Section IV
-    h4 = doc.add_heading("IV. EXPERIMENTAL SETUP", level=1)
-    h4.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_heading("IV. EXPERIMENTAL SETUP", level=1)
     doc.add_paragraph(
         "The system can be evaluated using camera-based posture samples representing different sitting conditions. The evaluation "
         "should include an upright posture and intentionally altered postures, such as forward slouching and lateral leaning, where "
@@ -353,8 +378,7 @@ def create_conference_report():
     ])
 
     # Section V
-    h5 = doc.add_heading("V. RESULTS AND DISCUSSION", level=1)
-    h5.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_heading("V. RESULTS AND DISCUSSION", level=1)
     doc.add_paragraph(
         "The proposed system was examined to understand its ability to identify posture-related deviations using camera-based pose "
         "estimation. The evaluation focused on the functioning of the camera input, landmark detection, geometric feature analysis, "
@@ -371,7 +395,7 @@ def create_conference_report():
         "the testing methodology. These values should be calculated from recorded test results rather than estimated."
     )
     doc.add_paragraph(
-        "The system's practical performance may be affected by camera angle, lighting, body occlusion, subject distance, and "
+        "The system’s practical performance may be affected by camera angle, lighting, body occlusion, subject distance, and "
         "variations in sitting posture. These factors should be considered when interpreting the experimental results."
     )
 
@@ -396,8 +420,7 @@ def create_conference_report():
             row.cells[0].paragraphs[0].runs[0].bold = False
 
     # Section VI
-    h6 = doc.add_heading("VI. LIMITATIONS", level=1)
-    h6.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_heading("VI. LIMITATIONS", level=1)
     doc.add_paragraph(
         "The proposed system has several limitations. Its performance depends on the quality of camera input and the visibility "
         "of the body landmarks required for posture analysis. Changes in camera position, lighting conditions, subject distance, and "
@@ -414,8 +437,7 @@ def create_conference_report():
     )
 
     # Section VII
-    h7 = doc.add_heading("VII. CONCLUSION AND FUTURE SCOPE", level=1)
-    h7.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_heading("VII. CONCLUSION AND FUTURE SCOPE", level=1)
     doc.add_paragraph(
         "This paper presented an AI-based posture monitoring system that uses computer vision and pose estimation to assess "
         "posture through camera input. By extracting body landmarks, analyzing geometric relationships, and comparing the observed "
@@ -432,8 +454,7 @@ def create_conference_report():
         "reports."
     )
 
-    h8 = doc.add_heading("REFERENCES", level=1)
-    h8.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_heading("REFERENCES", level=1)
     doc.add_paragraph("[1] V. Bazarevsky, I. Grishchenko, K. Raveendran, T. Zhu, F. Zhang, and M. Grundmann, \"BlazePose: On-device Real-time Body Pose Tracking,\" arXiv preprint arXiv:2006.10204, 2020.")
     doc.add_paragraph("[2] Google MediaPipe, \"MediaPipe Pose,\" Google AI, 2020.")
     doc.add_paragraph("[3] Add a verified research paper related to computer-vision-based posture detection.")
