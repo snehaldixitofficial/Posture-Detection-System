@@ -460,7 +460,7 @@ def create_conference_report():
     doc.add_paragraph("[3] K. Nakagawa et al., \"Real-time Posture Assessment using Computer Vision,\" IEEE Access, vol. 8, pp. 12040-12052, 2020.")
     doc.add_paragraph("[4] A. Smith, J. Doe, \"Ergonomic Posture Monitoring in Workplace Environments,\" Journal of Occupational Health, vol. 62, no. 1, 2020.")
 
-    doc.save(DOCS_DIR / "CONFERENCE_REPORT_v3.docx")
+    doc.save(DOCS_DIR / "CONFERENCE_REPORT_v4.docx")
 
 def create_project_thesis():
     doc = Document()
@@ -600,7 +600,7 @@ def create_project_thesis():
         "to geometric analysis and actionable UI feedback."
     )
 
-    doc.save(DOCS_DIR / "PROJECT_THESIS_v3.docx")
+    doc.save(DOCS_DIR / "PROJECT_THESIS_v4.docx")
 
 def main():
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
