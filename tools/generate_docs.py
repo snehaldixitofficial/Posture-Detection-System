@@ -1,5 +1,4 @@
 from pathlib import Path
-
 from docx import Document
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -7,13 +6,11 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DOCS_DIR = PROJECT_ROOT / "docs"
 NAVY = "17365D"
 PALE_BLUE = "EAF2F8"
 LIGHT_GRAY = "D9D9D9"
-
 
 def set_cell_shading(cell, fill):
     properties = cell._tc.get_or_add_tcPr()
@@ -22,7 +19,6 @@ def set_cell_shading(cell, fill):
         shading = OxmlElement("w:shd")
         properties.append(shading)
     shading.set(qn("w:fill"), fill)
-
 
 def set_cell_margins(cell, top=110, start=130, bottom=110, end=130):
     properties = cell._tc.get_or_add_tcPr()
@@ -37,7 +33,6 @@ def set_cell_margins(cell, top=110, start=130, bottom=110, end=130):
             margins.append(element)
         element.set(qn("w:w"), str(value))
         element.set(qn("w:type"), "dxa")
-
 
 def set_table_borders(table):
     properties = table._tbl.tblPr
@@ -54,7 +49,6 @@ def set_table_borders(table):
         border.set(qn("w:sz"), "6")
         border.set(qn("w:color"), LIGHT_GRAY)
 
-
 def configure_document(doc, subtitle):
     section = doc.sections[0]
     section.top_margin = Inches(0.75)
@@ -64,14 +58,14 @@ def configure_document(doc, subtitle):
 
     styles = doc.styles
     normal = styles["Normal"]
-    normal.font.name = "Aptos"
-    normal.font.size = Pt(10)
-    normal.paragraph_format.space_after = Pt(4)
-    normal.paragraph_format.line_spacing = 1.03
+    normal.font.name = "Times New Roman"
+    normal.font.size = Pt(11)
+    normal.paragraph_format.space_after = Pt(6)
+    normal.paragraph_format.line_spacing = 1.15
 
     title_style = styles["Title"]
-    title_style.font.name = "Aptos Display"
-    title_style.font.size = Pt(26)
+    title_style.font.name = "Times New Roman"
+    title_style.font.size = Pt(24)
     title_style.font.bold = True
     title_style.font.color.rgb = RGBColor(0, 0, 0)
     title_style_properties = title_style._element.get_or_add_pPr()
@@ -79,15 +73,15 @@ def configure_document(doc, subtitle):
     if title_style_border is not None:
         title_style_properties.remove(title_style_border)
 
-    for name, size in (("Heading 1", 16), ("Heading 2", 12.5), ("Heading 3", 11.5)):
+    for name, size in (("Heading 1", 14), ("Heading 2", 12), ("Heading 3", 11)):
         if name in styles:
             style = styles[name]
-            style.font.name = "Aptos Display"
+            style.font.name = "Times New Roman"
             style.font.size = Pt(size)
             style.font.bold = True
             style.font.color.rgb = RGBColor(0, 0, 0)
-            style.paragraph_format.space_before = Pt(10)
-            style.paragraph_format.space_after = Pt(4)
+            style.paragraph_format.space_before = Pt(12)
+            style.paragraph_format.space_after = Pt(6)
 
     title = doc.add_paragraph(style="Title")
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -97,156 +91,355 @@ def configure_document(doc, subtitle):
     if title_border is not None:
         title_properties.remove(title_border)
 
-    intro = doc.add_paragraph()
-    intro.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = intro.add_run(subtitle)
-    run.italic = True
-    run.font.size = Pt(11)
-    intro.paragraph_format.space_after = Pt(16)
-
+    if subtitle:
+        intro = doc.add_paragraph()
+        intro.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = intro.add_run(subtitle)
+        run.italic = True
+        run.font.size = Pt(11)
+        intro.paragraph_format.space_after = Pt(16)
 
 def add_bullets(doc, items):
     for item in items:
         paragraph = doc.add_paragraph(style="List Bullet")
         paragraph.add_run(item)
 
-
-def add_module_table(doc):
-    rows = [
-        ("Interface", "index.html and style.css", "Camera view, status, calibration control, and session metrics"),
-        ("Tracking", "script.js and MediaPipe Pose", "Estimates landmarks and draws the live skeleton"),
-        ("Validation", "isRealHumanUpperBody", "Rejects frames without plausible face and shoulder geometry"),
-        ("Classification", "predictPosture", "Compares normalized geometry with the active baseline"),
-        ("Reference data", "data/hf_posture_dataset.csv", "Supports exploration but does not train the live classifier"),
-        ("Documentation", "docs and tools/generate_docs.py", "Keeps project reports reproducible"),
-    ]
-    table = doc.add_table(rows=1, cols=3)
-    table.autofit = False
-    widths = (Inches(1.2), Inches(2.05), Inches(3.65))
-    headers = ("Module", "Files or function", "Responsibility")
-    for index, (cell, text, width) in enumerate(zip(table.rows[0].cells, headers, widths)):
-        cell.width = width
-        cell.text = text
-        cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
-        set_cell_shading(cell, NAVY)
-        set_cell_margins(cell)
-        for run in cell.paragraphs[0].runs:
-            run.font.bold = True
-            run.font.color.rgb = RGBColor(255, 255, 255)
-        cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-    for row_index, row_data in enumerate(rows):
-        cells = table.add_row().cells
-        for cell, text, width in zip(cells, row_data, widths):
-            cell.width = width
-            cell.text = text
-            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
-            set_cell_margins(cell)
-            if row_index % 2:
-                set_cell_shading(cell, PALE_BLUE)
-    set_table_borders(table)
-
-
 def create_conference_report():
     doc = Document()
-    doc.core_properties.title = "Posture Monitor Conference Review Report"
+    doc.core_properties.title = "AI BASED REAL TIME POSTURE DETECTION"
     doc.core_properties.subject = "Implementation and architecture review"
-    configure_document(
-        doc,
-        "Conference Paper Format: Architecture, Implementation, and Evaluation",
-    )
+    
+    configure_document(doc, "")
 
-    doc.add_heading("Abstract", level=1)
+    # Authors
+    authors_para = doc.add_paragraph()
+    authors_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    authors_run = authors_para.add_run(
+        "Pratyasha Singh\n"
+        "School of Computing Science Engineering and Artificial Engineering\n"
+        "VIT Bhopal, Bhopal, India\n"
+        "pratyasha.25mip10119@vitbhopal.ac.in\n\n"
+        "Snehal Dixit\n"
+        "School of Computing Science Engineering and Artificial Engineering\n"
+        "VIT Bhopal, Bhopal, India\n"
+        "snehal.mip10072@vitbhopal.ac.in"
+    )
+    authors_run.font.size = Pt(12)
+
+    # Abstract
+    p = doc.add_paragraph()
+    r = p.add_run("Abstract—")
+    r.bold = True
+    r.italic = True
+    r2 = p.add_run(
+        "Prolonged sitting and improper body alignment can contribute to physical discomfort and poor ergonomic habits. "
+        "This paper presents a browser-based AI-assisted posture monitoring system that uses MediaPipe Pose and computer "
+        "vision to provide real-time feedback on upper-body posture. The system processes camera frames locally to extract "
+        "relevant facial and shoulder landmarks, including the nose, eyes, ears, and shoulders. Two normalized geometric "
+        "features are calculated to estimate posture asymmetry and the relative distance between the face and shoulders. "
+        "These measurements are compared with a calibrated upright-posture baseline to identify three posture conditions: "
+        "upright posture, slouching, and lateral leaning. The application provides visual feedback, session tracking, and "
+        "event counters to improve users' awareness of their sitting posture. A landmark-visibility and geometric-validity "
+        "verification stage is also incorporated to reduce unreliable predictions caused by incomplete or implausible upper-body "
+        "detections. Since the system operates in the browser without transmitting camera frames to an application server, "
+        "it offers a privacy-conscious and accessible approach to posture monitoring. The proposed system is intended as a "
+        "posture-awareness aid rather than a medical diagnostic tool."
+    )
+    r2.bold = True
+
+    # Index Terms
+    p_idx = doc.add_paragraph()
+    r_idx = p_idx.add_run("Index Terms—")
+    r_idx.bold = True
+    r_idx.italic = True
+    r2_idx = p_idx.add_run("MediaPipe Pose, Computer Vision, Posture Monitoring, Pose Estimation, Geometric Features, Calibration, Real-Time Feedback, Human-Computer Interaction")
+    r2_idx.bold = True
+
+    # Section I
+    h1 = doc.add_heading("I. INTRODUCTION", level=1)
+    h1.alignment = WD_ALIGN_PARAGRAPH.CENTER
     doc.add_paragraph(
-        "This paper presents Posture Monitor, a static web application that performs real-time pose estimation "
-        "and posture classification entirely in the browser. By leveraging MediaPipe Pose and scale-independent "
-        "geometric feature extraction, the system delivers immediate visual feedback without relying on an "
-        "application server. This privacy-first approach ensures that sensitive camera frames remain on the local "
-        "device. The paper details the system architecture, geometric classification algorithms, validation "
-        "methodology, and current limitations."
-    )
-
-    doc.add_heading("Keywords", level=1)
-    doc.add_paragraph(
-        "Posture Detection, MediaPipe Pose, WebRTC, Edge Computing, Privacy-First, Human-Computer Interaction"
-    )
-
-    doc.add_heading("1. Introduction", level=1)
-    doc.add_paragraph(
-        "Maintaining proper posture is a critical factor in mitigating musculoskeletal disorders associated with "
-        "prolonged desktop computer use. Traditional posture monitoring systems often require dedicated hardware "
-        "or stream video to remote servers for processing, raising privacy concerns. This project addresses these "
-        "issues by executing all pose estimation and classification algorithms within the client's browser."
-    )
-
-    doc.add_heading("2. System Architecture", level=1)
-    doc.add_paragraph(
-        "The architecture is designed to minimize latency and ensure data privacy. The data flow is strictly local: "
-        "Camera Frame -> MediaPipe Pose -> Upper Body Validation -> Feature Calculation -> Threshold Classification -> UI."
+        "Maintaining proper body posture is an important aspect of physical well-being, particularly for individuals who spend "
+        "extended periods sitting while studying, working, or using digital devices. Prolonged sitting in an improper posture may "
+        "contribute to discomfort, fatigue, and musculoskeletal strain. However, continuous manual monitoring of posture is inconvenient "
+        "and difficult to maintain in everyday environments. This creates a need for accessible, non-invasive, and real-time posture "
+        "monitoring systems."
     )
     doc.add_paragraph(
-        "The browser owns the complete runtime path. It requests a single camera stream via WebRTC, displays a "
-        "preview while MediaPipe initializes, and processes frames through a sequential requestAnimationFrame loop. "
-        "This prevents duplicate camera streams and overlapping pose request bottlenecks."
-    )
-
-    doc.add_heading("3. Implementation Methodology", level=1)
-    add_module_table(doc)
-
-    doc.add_heading("3.1 Geometric Classification", level=2)
-    doc.add_paragraph(
-        "The application derives two scale-independent ratios to ensure robustness across varying camera distances. "
-        "Feature f1 is the absolute difference between the left and right face-to-shoulder distances, scaled by ten "
-        "and normalized by shoulder width. Feature f2 is the sum of those face-to-shoulder distances divided by "
-        "shoulder width."
+        "Recent developments in artificial intelligence and computer vision have made it possible to analyze human body posture "
+        "using ordinary cameras. Pose estimation techniques identify important body landmarks and provide geometric information "
+        "about the position and alignment of different body parts. Compared with wearable-based monitoring systems, camera-based "
+        "approaches can offer a contactless solution without requiring users to attach sensors to their bodies."
     )
     doc.add_paragraph(
-        "A user-initiated calibration step stores the active f1 and f2 values as the baseline. The classifier triggers "
-        "a 'slouch' state when f2 falls below the baseline minus a threshold (0.12), and a 'lean' state when f1 "
-        "deviates from the baseline by more than 0.55."
+        "This paper presents a browser-based posture monitoring system that uses MediaPipe Pose to estimate upper-body "
+        "landmarks from camera input. The system evaluates posture using normalized geometric features derived from facial and "
+        "shoulder landmarks. One feature measures left-right asymmetry between face-to-shoulder distances, while another evaluates "
+        "the combined face-to-shoulder distance relative to shoulder width. These measurements are compared with a calibrated "
+        "upright-posture baseline to classify the user's posture."
     )
-
-    validation_heading = doc.add_heading("3.2 Human Validation", level=2)
-    validation_heading.paragraph_format.page_break_before = True
-    add_bullets(
-        doc,
-        [
-            "Verification of high confidence scores for nose, eyes, and shoulders.",
-            "Requirement of at least one visible ear for geometric incenter calculation.",
-            "Positional check ensuring shoulders appear vertically below the nose.",
-            "Rejection of implausibly narrow shoulder spans (minimum width threshold).",
-            "Verification of the head-to-shoulder distance ratio to filter false positives.",
-        ],
-    )
-
-    doc.add_heading("4. Evaluation and Demonstration", level=1)
     doc.add_paragraph(
-        "The system has been evaluated through manual user testing. The demonstration protocol involves serving the "
-        "application over HTTPS, allowing camera access, and navigating through upright, slouched, and lateral lean "
-        "states after establishing a baseline. Transition counters successfully increment only upon state changes "
-        "rather than per-frame."
+        "The proposed system provides feedback for three posture states: upright, slouching, and lateral leaning. It also includes "
+        "a calibration mechanism that adapts the baseline to the user's body proportions and camera position. To improve reliability, "
+        "geometric validation checks are applied to reject incomplete or implausible upper-body detections. The application displays "
+        "posture status, session duration, and posture-event counters through a responsive web interface."
     )
-
-    doc.add_heading("5. Limitations and Future Work", level=1)
-    add_bullets(
-        doc,
-        [
-            "Classification accuracy is dependent on environmental lighting, camera angle, and clothing contrast.",
-            "Current heuristic thresholds (0.12 for slouch, 0.55 for lean) require broader clinical validation.",
-            "Reliance on third-party CDNs for MediaPipe models introduces external dependencies.",
-            "Future iterations should include time-based smoothing to filter brief, natural movements.",
-        ],
-    )
-
-    doc.add_heading("6. Conclusion", level=1)
     doc.add_paragraph(
-        "Posture Monitor successfully demonstrates that robust, real-time posture tracking can be achieved in a "
-        "static web environment without compromising user privacy. The integration of scale-normalized geometric "
-        "features and user-driven calibration provides a flexible and explainable classification model."
+        "Since the system processes camera frames within the browser and does not transmit or store those frames, it is designed "
+        "as a privacy-conscious posture-awareness tool. The proposed approach is intended for educational, office, and home "
+        "environments where users can receive immediate awareness of posture deviations. However, the system is a heuristic posture "
+        "aid and is not intended to diagnose or treat medical conditions."
     )
+
+    # Section II
+    h2 = doc.add_heading("II. PROPOSED METHODOLOGY", level=1)
+    h2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph(
+        "The proposed system is a camera-based posture monitoring application that uses computer vision to analyze the user's "
+        "body posture. The system captures video through a camera, processes the input using a pose estimation framework, extracts "
+        "relevant body landmarks, and evaluates posture using geometric relationships. A calibration mechanism establishes a reference "
+        "posture, which is used to identify deviations during monitoring."
+    )
+    doc.add_paragraph(
+        "The complete methodology consists of camera input acquisition, pose landmark detection, feature extraction, reference "
+        "calibration, posture classification, and feedback generation. The system is designed to operate through a browser-based "
+        "interface, allowing users to monitor their posture without requiring wearable sensors."
+    )
+
+    doc.add_heading("A. System Architecture", level=2)
+    doc.add_paragraph(
+        "The system architecture consists of five major components: camera input, pose estimation, geometric feature extraction, "
+        "posture assessment, and user feedback. The camera captures the user's upper-body posture. The pose estimation module "
+        "identifies relevant landmarks, which are passed to the feature extraction stage. The extracted measurements are compared "
+        "with a calibrated reference to determine the posture status. The result is then displayed through the user interface."
+    )
+    doc.add_paragraph("The overall workflow is represented as follows:")
+    
+    # Image 1
+    diagram_path = DOCS_DIR / "images" / "architecture_diagram.jpg"
+    if diagram_path.exists():
+        p_img = doc.add_paragraph()
+        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.add_run().add_picture(str(diagram_path), width=Inches(3.5))
+        p_img2 = doc.add_paragraph("Fig. 1. Workflow of the proposed posture monitoring system.")
+        p_img2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    else:
+        doc.add_paragraph("Camera Input -> Pose Estimation -> Landmark Extraction -> Geometric Feature Analysis -> Calibration Reference -> Posture Classification -> User Feedback")
+        p_cap = doc.add_paragraph("Fig. 1. Workflow of the proposed posture monitoring system.")
+        p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    doc.add_heading("B. Pose Estimation", level=2)
+    doc.add_paragraph(
+        "The system uses MediaPipe Pose to identify body landmarks from the camera input. Pose estimation provides the spatial "
+        "coordinates of relevant body points, which can be used to analyze body alignment. The detected landmarks form the "
+        "foundation of the posture assessment process."
+    )
+    doc.add_paragraph(
+        "The system focuses on upper-body landmarks relevant to posture analysis. The quality of posture assessment depends "
+        "on the visibility and reliability of these landmarks. When the required landmarks are not detected reliably, the system can "
+        "avoid making an invalid posture assessment."
+    )
+
+    # Image 2
+    overlay_path = DOCS_DIR / "images" / "posture_overlay.jpg"
+    if overlay_path.exists():
+        p_img3 = doc.add_paragraph()
+        p_img3.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img3.add_run().add_picture(str(overlay_path), width=Inches(4.5))
+        p_img4 = doc.add_paragraph("Fig. 2. Digital skeletal framework illustrating MediaPipe Pose landmark estimation.")
+        p_img4.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    doc.add_heading("C. Geometric Feature Extraction", level=2)
+    doc.add_paragraph(
+        "After detecting the body landmarks, the system calculates geometric relationships between selected landmarks to repre"
+        "sent the user's posture. These relationships provide information about body alignment and deviations from the reference "
+        "position."
+    )
+    doc.add_paragraph(
+        "The extracted features are based on the relative positions of facial and shoulder landmarks. Using relative or normalized "
+        "measurements helps reduce the influence of changes in image scale and the user's distance from the camera. The resulting "
+        "features are used by the posture assessment logic to identify possible slouching or lateral leaning."
+    )
+
+    doc.add_heading("D. Calibration", level=2)
+    doc.add_paragraph(
+        "The system includes a calibration stage to establish a reference for the user's upright posture. During calibration, "
+        "the user is expected to sit in the desired upright position. The system records posture-related measurements from this "
+        "reference position."
+    )
+    doc.add_paragraph(
+        "The calibrated values are subsequently used to compare the current posture with the expected posture. This approach "
+        "allows the system to account for differences in user body proportions and camera placement. However, the calibration is "
+        "dependent on the user maintaining a suitable reference posture and keeping the camera position consistent."
+    )
+
+    doc.add_heading("E. Posture Classification", level=2)
+    doc.add_paragraph(
+        "The posture classification stage compares the current geometric features with the calibrated reference values. Based on "
+        "the implemented decision rules, the system determines whether the observed posture is within the expected range or indicates "
+        "a posture deviation."
+    )
+    doc.add_paragraph(
+        "The system is intended to identify posture-related deviations such as slouching and lateral leaning. The classification is "
+        "based on geometric analysis rather than medical assessment. Factors such as camera angle, lighting, body occlusion, and "
+        "incorrect landmark detection may influence the classification outcome."
+    )
+
+    doc.add_heading("F. Feedback and Monitoring", level=2)
+    doc.add_paragraph(
+        "The system presents the detected posture status through a user interface. This feedback is intended to improve the "
+        "user's awareness of posture deviations and encourage the maintenance of an upright sitting position."
+    )
+    doc.add_paragraph(
+        "The monitoring interface may display posture status and session-related information depending on the implemented "
+        "features. By providing feedback during camera-based monitoring, the system aims to support users in developing better "
+        "posture awareness during prolonged sitting activities."
+    )
+
+    # Section III
+    h3 = doc.add_heading("III. IMPLEMENTATION", level=1)
+    h3.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph(
+        "The proposed system is implemented as a browser-based application using web technologies and a computer vision "
+        "pose estimation framework. The application integrates camera access, pose landmark detection, geometric feature processing, "
+        "posture assessment, and a graphical user interface."
+    )
+    doc.add_paragraph(
+        "The implementation is organized into functional components that handle camera input, landmark processing, posture "
+        "evaluation, and user-interface updates. This organization allows the posture assessment logic to operate separately from "
+        "the presentation layer and makes the system easier to maintain and extend."
+    )
+
+    p_table1 = doc.add_paragraph("TABLE I\nTECHNOLOGIES USED IN THE PROPOSED SYSTEM")
+    p_table1.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table1 = doc.add_table(rows=6, cols=2)
+    table1.style = 'Table Grid'
+    t1_data = [
+        ("Component", "Technology"),
+        ("Pose Estimation", "MediaPipe Pose"),
+        ("Programming", "JavaScript / Project Implementation"),
+        ("Interface", "HTML and CSS"),
+        ("Input", "Camera Feed"),
+        ("Processing", "Geometric Feature Analysis")
+    ]
+    for i, (col1, col2) in enumerate(t1_data):
+        row = table1.rows[i]
+        row.cells[0].text = col1
+        row.cells[1].text = col2
+        if i == 0:
+            row.cells[0].paragraphs[0].runs[0].bold = True
+            row.cells[1].paragraphs[0].runs[0].bold = True
+
+    # Section IV
+    h4 = doc.add_heading("IV. EXPERIMENTAL SETUP", level=1)
+    h4.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph(
+        "The system can be evaluated using camera-based posture samples representing different sitting conditions. The evaluation "
+        "should include an upright posture and intentionally altered postures, such as forward slouching and lateral leaning, where "
+        "these categories are supported by the implementation."
+    )
+    doc.add_paragraph(
+        "During testing, the system should be observed under different conditions, including changes in camera position, lighting, "
+        "and user posture. The evaluation should record the predicted posture, the actual posture category, and the response of the "
+        "feedback mechanism."
+    )
+    doc.add_paragraph("The following parameters may be recorded during evaluation:")
+    add_bullets(doc, [
+        "Correct and incorrect posture classifications.",
+        "Detection response under different posture conditions.",
+        "Consistency of predictions during continuous monitoring.",
+        "Response time of the feedback mechanism.",
+        "Effect of camera position and lighting on detection."
+    ])
+
+    # Section V
+    h5 = doc.add_heading("V. RESULTS AND DISCUSSION", level=1)
+    h5.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph(
+        "The proposed system was examined to understand its ability to identify posture-related deviations using camera-based pose "
+        "estimation. The evaluation focused on the functioning of the camera input, landmark detection, geometric feature analysis, "
+        "posture classification, and feedback display."
+    )
+    doc.add_paragraph(
+        "The system is expected to identify an upright posture and detect deviations such as slouching and lateral leaning when "
+        "the relevant landmarks are visible and the camera is positioned appropriately. The calibration mechanism provides a reference "
+        "for comparing subsequent posture observations."
+    )
+    doc.add_paragraph(
+        "The final performance of the system should be reported using actual experimental observations. Suitable evaluation "
+        "measures include classification accuracy, precision, recall, F1-score, detection consistency, and response time, depending on "
+        "the testing methodology. These values should be calculated from recorded test results rather than estimated."
+    )
+    doc.add_paragraph(
+        "The system's practical performance may be affected by camera angle, lighting, body occlusion, subject distance, and "
+        "variations in sitting posture. These factors should be considered when interpreting the experimental results."
+    )
+
+    p_table2 = doc.add_paragraph("TABLE II\nPOSTURE CLASSIFICATION RESULTS")
+    p_table2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    table2 = doc.add_table(rows=4, cols=4)
+    table2.style = 'Table Grid'
+    t2_data = [
+        ("Actual / Predicted", "Upright", "Slouching", "Leaning"),
+        ("Upright", "—", "—", "—"),
+        ("Slouching", "—", "—", "—"),
+        ("Leaning", "—", "—", "—")
+    ]
+    for i, row_data in enumerate(t2_data):
+        row = table2.rows[i]
+        for j, cell_text in enumerate(row_data):
+            row.cells[j].text = cell_text
+            row.cells[j].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            if i == 0:
+                row.cells[j].paragraphs[0].runs[0].bold = True
+        if i > 0:
+            row.cells[0].paragraphs[0].runs[0].bold = False
+
+    # Section VI
+    h6 = doc.add_heading("VI. LIMITATIONS", level=1)
+    h6.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph(
+        "The proposed system has several limitations. Its performance depends on the quality of camera input and the visibility "
+        "of the body landmarks required for posture analysis. Changes in camera position, lighting conditions, subject distance, and "
+        "partial body occlusion may affect the detected landmarks and classification results."
+    )
+    doc.add_paragraph(
+        "The posture assessment is based on geometric rules and a calibrated reference. Therefore, it may not represent every pos"
+        "sible posture variation or individual ergonomic requirement. The system is intended for posture awareness and is not a "
+        "medical diagnostic or treatment tool."
+    )
+    doc.add_paragraph(
+        "Further evaluation with a larger and more diverse set of users and posture samples is required to assess the generalizability "
+        "and robustness of the approach."
+    )
+
+    # Section VII
+    h7 = doc.add_heading("VII. CONCLUSION AND FUTURE SCOPE", level=1)
+    h7.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph(
+        "This paper presented an AI-based posture monitoring system that uses computer vision and pose estimation to assess "
+        "posture through camera input. By extracting body landmarks, analyzing geometric relationships, and comparing the observed "
+        "posture with a calibrated reference, the system provides a non-invasive approach to posture awareness."
+    )
+    doc.add_paragraph(
+        "The browser-based design allows the system to be used with a standard camera without requiring wearable sensors. The "
+        "proposed approach can support users in becoming more aware of posture deviations during prolonged sitting activities."
+    )
+    doc.add_paragraph(
+        "Future work may include improving the robustness of posture classification, evaluating the system using larger and more "
+        "diverse datasets, incorporating temporal analysis to reduce unstable predictions, and supporting additional posture cate"
+        "gories. Further improvements may also include enhanced feedback, personalized thresholds, and detailed posture-monitoring "
+        "reports."
+    )
+
+    h8 = doc.add_heading("REFERENCES", level=1)
+    h8.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph("[1] V. Bazarevsky, I. Grishchenko, K. Raveendran, T. Zhu, F. Zhang, and M. Grundmann, \"BlazePose: On-device Real-time Body Pose Tracking,\" arXiv preprint arXiv:2006.10204, 2020.")
+    doc.add_paragraph("[2] Google MediaPipe, \"MediaPipe Pose,\" Google AI, 2020.")
+    doc.add_paragraph("[3] Add a verified research paper related to computer-vision-based posture detection.")
+    doc.add_paragraph("[4] Add a verified research paper related to ergonomic posture monitoring.")
 
     doc.save(DOCS_DIR / "CONFERENCE_REPORT_v2.docx")
-
 
 def create_project_thesis():
     doc = Document()
@@ -393,7 +586,6 @@ def main():
     create_conference_report()
     create_project_thesis()
     print(f"Updated Word reports in {DOCS_DIR}")
-
 
 if __name__ == "__main__":
     main()
