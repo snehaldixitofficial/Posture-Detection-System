@@ -121,31 +121,25 @@ def create_conference_report():
     
     configure_document(doc, "", justify=True, font_size=10)
 
-    # Authors Table for 6 authors (3 columns, 2 rows)
-    table_authors = doc.add_table(rows=2, cols=3)
+    # Authors Table for 3 authors (2 columns, 2 rows)
+    table_authors = doc.add_table(rows=2, cols=2)
     table_authors.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
     authors_data = [
-        "Snehal Dixit",
-        "Vaishnavi Dixit",
-        "Pratyasha Singh",
-        "Jahnavi Gaur",
-        "Geetesh Parashar",
-        "Dr. Pravindra Shekhar\n(Faculty Guide)"
+        ("Snehal Dixit", 0, 0),
+        ("Pratyasha Singh", 0, 1),
+        ("Dr. Pravindra Shekhar\n(Faculty Guide)", 1, 0)
     ]
     
-    for i, name in enumerate(authors_data):
-        row = i // 3
-        col = i % 3
+    for name, row, col in authors_data:
         cell = table_authors.rows[row].cells[col]
         p = cell.paragraphs[0]
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         r_name = p.add_run(f"{name}\n")
         r_name.font.size = Pt(11)
         
-        # Adjust university text size to fit cleanly
         r_uni = p.add_run("School of Computing Science\nand Artificial Intelligence\nVIT Bhopal University\nBhopal, India")
-        r_uni.font.size = Pt(9)
+        r_uni.font.size = Pt(10)
         r_uni.italic = True
 
     doc.add_paragraph() # Spacing
