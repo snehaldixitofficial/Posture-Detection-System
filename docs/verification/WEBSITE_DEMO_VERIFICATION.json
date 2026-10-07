@@ -1,0 +1,64 @@
+{
+  "verified_at_utc": "2026-10-07T04:23:27.746720+00:00",
+  "public_url": "https://posture-detection-plum.vercel.app/",
+  "public_code_hashes": {
+    "index.html": "19f597b071891541af96cc0bae933254f92cc3a6e0e5ee797b18b0530fa11fe1",
+    "style.css": "1c05f8358188c881b8eb9507049c5dfcbc6b2644526025b0d56ab8ed31aac2ca",
+    "script.js": "35f08567a935622f0b8ca4b156a6b3104d57a474ab4ceb69c6de56a6a07d40b5",
+    "posture-features.js": "0e58a758316e9248623cff5b24e70aff725691ef8136d637f7c8ba2477136619",
+    "model-runtime.js": "13f6ccb0605e7e1b79d01ede65d79bc77026cbc66678049e459c750d513f7687",
+    "assets/docs/DEMO_GUIDE.md": "25c91a090b3d82aa36b0e978e65feca11656f9b73121ab22e80493ca7d97b9f6",
+    "assets/paper/STAY_UPRIGHT_IEEE.pdf": "4cf5ac72e0986e57ef438bdbafd400e7231f309114102c033c5a5c8d9f447af4",
+    "assets/paper/STAY_UPRIGHT_IEEE.tex": "b63a0b2e875024c720b93f83c85149b93927218cf0e7d40abeff01d07c07ed7a"
+  },
+  "model_scope": "Frozen take-02 models; separate all-data RF refit is not used on this website",
+  "browser_python_parity": {
+    "samples": 1930,
+    "predictionsChecked": 5790,
+    "allLabelsMatch": true,
+    "maximumFeatureError": 5.684341886080802e-14,
+    "scope": "Recorded sample parity; not a fresh webcam accuracy evaluation"
+  },
+  "tests": "13 Python tests and browser controller tests passed",
+  "camera_check": "Pose runtime loaded to camera permission request. Fresh webcam predictions and accuracy were not evaluated.",
+  "paper": "Seven-page general IEEE-style conference draft; four explicit research contributions; artifact values checked; acknowledgment removed; fallback PDF and IEEEtran source publicly verified by SHA-256",
+  "deployment": {
+    "id": "dpl_4wFK7UaRqqx4ZkGqcF9Fe8jhwStv",
+    "url": "posture-detection-nbhqkw5q5-adilsukumar24-9756s-projects.vercel.app",
+    "readyState": "READY",
+    "alias": [
+      "posture-detection-plum.vercel.app",
+      "posture-detection-adilsukumar24-9756s-projects.vercel.app"
+    ],
+    "target": "production",
+    "public_files": [
+      "index.html",
+      "style.css",
+      "script.js",
+      "posture-features.js",
+      "model-runtime.js",
+      "vercel.json",
+      "assets/docs/CODE_WALKTHROUGH.md",
+      "assets/docs/DEMO_GUIDE.md",
+      "assets/mediapipe/README.md",
+      "assets/mediapipe/THIRD_PARTY.md",
+      "assets/mediapipe/VERSION.json",
+      "assets/mediapipe/vision_bundle.mjs",
+      "assets/mediapipe/wasm/vision_wasm_internal.js",
+      "assets/mediapipe/wasm/vision_wasm_internal.wasm",
+      "assets/mediapipe/wasm/vision_wasm_module_internal.js",
+      "assets/mediapipe/wasm/vision_wasm_module_internal.wasm",
+      "assets/mediapipe/wasm/vision_wasm_nosimd_internal.js",
+      "assets/mediapipe/wasm/vision_wasm_nosimd_internal.wasm",
+      "assets/models/comparison.json",
+      "assets/models/Random_Forest.json",
+      "assets/models/SVM_RBF.json",
+      "assets/models/XGBoost.json",
+      "assets/paper/STAY_UPRIGHT_IEEE.pdf",
+      "assets/paper/STAY_UPRIGHT_IEEE.tex",
+      "assets/pose_landmarker_lite.task"
+    ]
+  },
+  "design_revision": "Warm light palette, plain wording, camera with comparison sidebar, technical readings collapsed; controller checks passed.",
+  "paper_verified_at_utc": "2026-10-07T04:37:23.111965+00:00"
+}

@@ -1,102 +1,62 @@
-# Posture Monitor
+# Stay Upright
 
-Posture Monitor is a static web application that uses MediaPipe Pose to estimate upper-body landmarks and provide real-time posture feedback. Camera frames are processed in the browser and are not uploaded by this project.
+Browser webcam demo with Random Forest, RBF SVM, XGBoost and the original rule
+baseline. Only head and shoulders are required. Camera data stays on the device.
 
-## Features
-
-- Live posture feedback for upright, slouching, and lateral leaning states
-- User calibration for different body proportions and camera angles
-- Five geometric checks that reject incomplete or implausible upper-body detections
-- Session timer plus slouch and lean event counters
-- Responsive, accessible interface with clear camera and tracking status
-- No application server or account required
-
-## How it works
-
-```mermaid
-flowchart LR
-    A[Camera frame] --> B[MediaPipe Pose]
-    B --> C{Valid upper body}
-    C -- No --> D[Prompt user to reposition]
-    C -- Yes --> E[Calculate f1 and f2]
-    E --> F[Compare with calibrated baseline]
-    F --> G[Update status counters and canvas]
-```
-
-The browser computes two normalized geometric features:
-
-- `f1` measures left-right asymmetry between face-to-shoulder distances.
-- `f2` measures the combined face-to-shoulder distance relative to shoulder width.
-
-The classifier compares those measurements with a baseline. Before calibration it uses conservative defaults; after calibration it uses the user's current upright pose. This is a heuristic posture aid, not a medical device or diagnostic tool.
-
-## Project structure
-
-```text
-.
-|-- index.html                 Web interface
-|-- style.css                  Responsive presentation
-|-- script.js                  Camera, MediaPipe, geometry, and UI logic
-|-- vercel.json                Static Vercel configuration
-|-- requirements.txt           Optional Python tooling dependencies
-|-- data/
-|   `-- hf_posture_dataset.csv  Reference dataset for exploration
-|-- docs/
-|   |-- CONFERENCE_REPORT.docx
-|   |-- PROJECT_THESIS.docx
-|   `-- TEAM_ROLES.md
-`-- tools/
-    |-- fetch_dataset.py       Re-downloads the reference dataset
-    `-- generate_docs.py      Rebuilds the Word reports
-```
-
-> [!NOTE]
-> **Dataset Disclaimer**: The reference dataset in the `data/` directory is originally from a Kaggle "Confidence Detection" dataset. Although its original goal was to predict confidence levels based on sitting habits, it was selected for this project because it provides a reliable, pre-extracted set of MediaPipe landmarks mapping explicitly to slouching and upright postures.
-> 
-> The dataset contains `Upright`, `Stiff`, and `Slouched` labels. Its schema does not match the live `f1` and `f2` features used in this application, and it has no lateral-lean class. Therefore, it is retained solely for exploration, reproducibility, and reference. It is **not** used to train the live heuristic browser classifier, which relies entirely on real-time geometric math.
-
-## Run locally
-
-Camera access requires a secure context. Localhost is treated as secure by modern browsers.
+## Run
 
 ```powershell
-python -m http.server 8000
+.\.venv\Scripts\python.exe -m http.server 8001 --bind 127.0.0.1
 ```
 
-Open [http://localhost:8000](http://localhost:8000), allow camera access, sit fully in frame, and select **Calibrate posture** while sitting upright.
+Open http://127.0.0.1:8001/, click Start camera and allow access. All three live
+cards compare the same frame. Calibration is only for the three-state rules.
+Mirror/landmark controls and fullscreen support presentations. Pinned MediaPipe
+0.10.35 JS/WASM and the pose asset are served with the website.
 
-The page loads MediaPipe and Google Fonts from public CDNs, so the first load requires an internet connection.
+Read [Demo and viva guide](docs/DEMO_GUIDE.md) and
+[Code walkthrough](docs/CODE_WALKTHROUGH.md).
 
-## Optional Python tools
+## Research
 
-Create an environment and install the tooling dependencies:
+The [S01 pilot](docs/PILOT_RESULTS_S01.md) is complete: one participant, eight
+videos, 1,930 retained rows, four classes. Take 02 is development; take 03 is the
+video-disjoint test. Website models are the frozen tested artifacts. The separate
+all-data RF refit remains available for the optional Python research server.
+Accuracy on new participants has not been established.
+
+[Protocol](docs/RESEARCH_PROTOCOL.md) documents recording, QC and evaluation.
+Public reference datasets were assessed and excluded from this experiment.
+[Conference paper](docs/paper/STAY_UPRIGHT_IEEE.pdf) and
+[LaTeX](docs/paper/STAY_UPRIGHT_IEEE.tex) retain the original measured results.
+The PDF is an IEEE-style fallback; native IEEEtran compilation is unavailable.
+
+## Main files
+
+- `index.html`, `style.css`: structure and layout.
+- `script.js`: camera lifecycle, MediaPipe and feedback.
+- `posture-features.js`: 21-feature contract, matching Python.
+- `model-runtime.js`: readable inference over learned JSON parameters.
+- `research/`: Python recording, extraction, training and loopback server.
+- `tools/export_browser_models.py`: model and paper exports.
+
+## Verify
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-```
-
-Re-download the reference dataset:
-
-```powershell
-python tools\fetch_dataset.py
-```
-
-Rebuild the Word reports:
-
-```powershell
-python tools\generate_docs.py
+.\.venv\Scripts\python.exe -m tools.export_browser_models
+.\.venv\Scripts\python.exe -m tools.check_browser_parity
+node tests/test_browser_models.cjs
+node tests/test_browser.cjs
+.\.venv\Scripts\python.exe -m unittest discover -s tests
 ```
 
 ## Deploy
 
-The application is static and can be deployed to Vercel or another HTTPS static host. Keep `index.html`, `style.css`, and `script.js` together at the site root.
+`tools/deploy_static.py` uploads an explicit public allowlist to the existing
+Vercel project. Private recordings, landmark fixtures, joblib files and credentials
+are excluded. HTTPS is required for a hosted camera demo.
 
-## Privacy and limitations
-
-- This project does not transmit or store camera frames.
-- MediaPipe assets and fonts are fetched from third-party CDNs.
-- Counts are session-only and reset when the page reloads.
-- Accuracy depends on lighting, camera placement, visibility, and calibration.
-- The tool should not be used to diagnose or treat a health condition.
+This is a research prototype, not a clinical assessment. The timing display
+measures one classifier call, not end-to-end latency. Counters record prediction
+transitions and may increase when labels fluctuate. Exported-model parity verifies
+implementation equivalence, not accuracy on new people.

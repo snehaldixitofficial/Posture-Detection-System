@@ -1,60 +1,297 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A privacy-first posture monitor that runs MediaPipe Pose in your browser.">
-    <title>Posture Monitor</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A student project comparing Random Forest, SVM and XGBoost for webcam posture detection."
+    />
+    <title>Stay Upright — Posture monitor</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <div class="container">
-        <header>
-            <h1>Stay Upright.</h1>
-            <p>Private, real-time posture feedback in your browser.</p>
-        </header>
-        
-        <main>
-            <div class="video-wrapper">
-                <video id="input_video" style="display: none;" playsinline></video>
-                <canvas id="output_canvas" width="800" height="600" aria-label="Live camera view with posture landmarks">
-                    Your browser does not support the canvas element.
-                </canvas>
-
-                <div id="status-overlay" role="status" aria-live="polite">Waiting for camera...</div>
-
-                <button id="calibrate-btn" type="button" disabled>Calibrate posture</button>
+      <header>
+        <a class="brand" href="#demo">Stay Upright</a>
+        <nav aria-label="Page sections">
+          <a href="#demo">Camera</a>
+          <a href="#research">Results</a>
+          <a href="#explain">About the project</a>
+        </nav>
+      </header>
+      <main>
+        <section id="demo">
+          <div class="page-heading">
+            <h1>Posture monitor</h1>
+            <p class="intro">
+              Start your camera and keep your head and shoulders in view. You
+              can change the model while trying different postures.
+            </p>
+          </div>
+          <div class="demo-workspace">
+            <div class="camera-column">
+              <div class="model-controls">
+                <label for="classifier-mode">Choose a model</label>
+                <select id="classifier-mode">
+                  <option value="Random_Forest">Random Forest</option>
+                  <option value="SVM_RBF">SVM (RBF)</option>
+                  <option value="XGBoost">XGBoost</option>
+                  <option value="rules">Simple posture rules</option>
+                </select>
+                <p id="model-status" role="status"></p>
+              </div>
+              <div id="camera-panel" class="camera-panel">
+                <div class="camera-top">
+                  <span id="active-model">Random Forest</span
+                  ><span>Camera preview</span>
+                </div>
+                <div class="video-wrapper">
+                  <video id="input_video" playsinline muted hidden></video>
+                  <canvas
+                    id="output_canvas"
+                    class="mirrored"
+                    width="640"
+                    height="480"
+                    aria-label="Live camera with head and shoulder landmarks"
+                  ></canvas>
+                  <div id="status-overlay" role="status" aria-live="polite">
+                    Your camera is off
+                  </div>
+                </div>
+                <div class="camera-actions">
+                  <button id="start-btn" type="button" class="primary">
+                    Start camera
+                  </button>
+                  <button id="stop-btn" type="button" disabled>Stop</button>
+                  <button id="calibrate-btn" type="button" disabled hidden>
+                    Set upright position
+                  </button>
+                  <button id="fullscreen-btn" type="button">Fullscreen</button>
+                </div>
+              </div>
+              <div class="view-options">
+                <label
+                  ><input id="mirror-toggle" type="checkbox" checked /> Mirror
+                  camera</label
+                >
+                <label
+                  ><input id="landmarks-toggle" type="checkbox" checked /> Show
+                  tracking points</label
+                >
+              </div>
+              <p class="hint">
+                Try sitting upright, slouching, then leaning to either side.
+                Left and right refer to your own left and right, even with the
+                camera mirrored. Keep both ears and shoulders visible.
+              </p>
+              <p class="privacy-note">Your video stays on your device.</p>
             </div>
-
-            <!-- Stats Dashboard -->
-            <div class="stats-dashboard">
-                <div class="stat-box">
-                    <span class="stat-label">Session Time</span>
-                    <span class="stat-value" id="session-time">00:00</span>
+            <aside
+              class="comparison-column"
+              aria-label="Model comparison and session"
+            >
+              <h2>Compare the predictions</h2>
+              <p class="aside-note">
+                All three models look at the same camera frame. Their answers
+                may differ.
+              </p>
+              <div class="live-models" aria-label="Live model comparison">
+                <div>
+                  <span>Random Forest</span
+                  ><strong id="live-Random_Forest">Waiting</strong>
                 </div>
-                <div class="stat-box">
-                    <span class="stat-label">Slouch Count</span>
-                    <span class="stat-value" id="slouch-count">0</span>
+                <div>
+                  <span>SVM</span><strong id="live-SVM_RBF">Waiting</strong>
                 </div>
-                <div class="stat-box">
-                    <span class="stat-label">Lean Count</span>
-                    <span class="stat-value" id="lean-count">0</span>
+                <div>
+                  <span>XGBoost</span><strong id="live-XGBoost">Waiting</strong>
                 </div>
-                <div class="stat-box">
-                    <span class="stat-label">Calibration</span>
-                    <span class="stat-value" id="calibration-status" style="color: #ff3b30;">Pending</span>
+              </div>
+              <div class="session-heading">
+                <h2>This session</h2>
+                <button id="reset-btn" type="button">Reset</button>
+              </div>
+              <div class="stats-dashboard">
+                <div>
+                  <span>Time</span><strong id="session-time">00:00</strong>
                 </div>
-            </div>
-
-            <p class="privacy-note">Video is processed on this device and is not uploaded.</p>
-        </main>
+                <div>
+                  <span>Slouch events</span><strong id="slouch-count">0</strong>
+                </div>
+                <div>
+                  <span>Lean events</span><strong id="lean-count">0</strong>
+                </div>
+              </div>
+              <details class="reading-details">
+                <summary>More about these readings</summary>
+                <div class="technical-readings">
+                  <span>Input</span
+                  ><strong id="calibration-status">21 features</strong
+                  ><span>Prediction time</span
+                  ><strong id="inference-time">—</strong>
+                </div>
+                <p>
+                  Time is for one classifier call, excluding camera tracking and
+                  drawing. Events count changes in the predicted posture;
+                  flickering predictions can increase the count.
+                </p>
+                <p>
+                  The first start loads the tracking and model files from this
+                  website.
+                </p>
+              </details>
+            </aside>
+          </div>
+        </section>
+        <section id="research" class="section">
+          <h2>Test results</h2>
+          <p>
+            For this pilot, one person recorded eight videos in four postures.
+            The first set of recordings was used for training (962 frames); a
+            separate set was used for testing (968 frames). The models in the
+            demo are the ones evaluated below.
+          </p>
+          <div class="table-scroll">
+            <table>
+              <caption>
+                Results on the separate test recordings
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Model</th>
+                  <th scope="col">Accuracy</th>
+                  <th scope="col">Macro F1</th>
+                  <th scope="col">Validation F1</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Random Forest</th>
+                  <td>98.35%</td>
+                  <td>0.9835</td>
+                  <td>0.9807</td>
+                </tr>
+                <tr>
+                  <th scope="row">SVM (RBF)</th>
+                  <td>95.14%</td>
+                  <td>0.9510</td>
+                  <td>0.9807</td>
+                </tr>
+                <tr>
+                  <th scope="row">XGBoost</th>
+                  <td>98.86%</td>
+                  <td>0.9886</td>
+                  <td>0.9494</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="study-note">
+            This study has only one participant, so these numbers do not tell us
+            how well the models will work for other people.
+          </p>
+          <details>
+            <summary>How was the model selected?</summary>
+            <p>
+              Random Forest and SVM tied on validation macro F1. Random Forest
+              was selected using the experiment's documented tie order. XGBoost
+              scored highest on the separate test videos. The original
+              three-state rules scored 0.9756 macro F1; the separately evaluated
+              four-state directional rule extension scored 0.9762.
+            </p>
+          </details>
+          <details>
+            <summary>What did the models get wrong?</summary>
+            <p>
+              All errors on the test recordings were upright frames classified
+              as Slouch: 16 for Random Forest, 47 for SVM and 11 for XGBoost,
+              out of 242 upright frames. All three models correctly classified
+              the 242 test frames in each of the other classes. Frames close
+              together in a video are correlated; they are not separate
+              participants.
+            </p>
+          </details>
+          <div class="downloads">
+            <a
+              href="assets/paper/STAY_UPRIGHT_IEEE.pdf"
+              target="_blank"
+              rel="noopener"
+              >Read the paper ↗</a
+            ><a href="assets/paper/STAY_UPRIGHT_IEEE.tex" download
+              >LaTeX source</a
+            ><a href="assets/models/comparison.json" download
+              >Download results</a
+            >
+          </div>
+          <p class="hint">
+            The paper is an IEEE-style draft. A conference has not yet been
+            selected.
+          </p>
+        </section>
+        <section id="explain" class="section">
+          <h2>About the project</h2>
+          <p>
+            This project compares three machine-learning models for detecting
+            posture from a regular webcam. It uses the face and shoulders, so
+            the rest of your body does not need to be in the frame.
+          </p>
+          <h3>How it works</h3>
+          <ol class="steps">
+            <li>
+              MediaPipe finds points on the nose, eyes, ears and shoulders.
+            </li>
+            <li>
+              The code checks that seven required points are visible, then
+              calculates 21 measurements: distances, angles, offsets and
+              estimated depth differences.
+            </li>
+            <li>
+              The same measurements go to each trained model. Random Forest
+              combines tree probabilities, SVM uses pairwise votes, and XGBoost
+              adds tree scores.
+            </li>
+            <li>
+              The selected model's answer appears on the camera view. The
+              comparison panel shows the other models' answers.
+            </li>
+          </ol>
+          <details>
+            <summary>What does this project contribute?</summary>
+            <p>
+              The contribution is the complete, auditable pipeline:
+              head-and-shoulder measurements, quality checks that preserve
+              slouch examples, testing on separate videos, and browser
+              predictions checked against Python. The three classifiers are
+              established algorithms. More participants are needed to evaluate
+              whether the approach generalizes.
+            </p>
+          </details>
+          <details>
+            <summary>Why can I only calibrate the simple rules?</summary>
+            <p>
+              The rules compare two measurements with your upright reference.
+              The trained models use a fixed set of inputs; changing those
+              inputs through calibration would make them different from the
+              training data.
+            </p>
+          </details>
+          <div class="downloads">
+            <a href="assets/docs/DEMO_GUIDE.md" download>Demo and viva guide</a
+            ><a href="assets/docs/CODE_WALKTHROUGH.md" download
+              >Code walkthrough</a
+            >
+          </div>
+        </section>
+      </main>
+      <footer>
+        <span>Snehal Dixit · VIT Bhopal University, SCAI</span
+        ><span>Student research project. Not a clinical assessment.</span>
+      </footer>
     </div>
-
-    <noscript>This application requires JavaScript for camera-based posture tracking.</noscript>
+    <noscript>Enable JavaScript to use the camera demo.</noscript>
+    <script src="posture-features.js"></script>
+    <script src="model-runtime.js"></script>
     <script src="script.js"></script>
-</body>
+  </body>
 </html>

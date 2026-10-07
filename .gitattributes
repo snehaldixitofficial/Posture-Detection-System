@@ -1,0 +1,13 @@
+# Preserve exact deployed assets and the publisher's dataset checksum.
+assets/** -text
+data/public/multiposture.csv -text
+*.tex -text
+
+*.pdf binary
+*.docx binary
+*.zip binary
+*.wasm binary
+*.task binary
+
+# Upstream generated MediaPipe files are retained without formatting changes.
+assets/mediapipe/** whitespace=-trailing-space,-blank-at-eof

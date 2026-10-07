@@ -1,0 +1,6 @@
+{
+  "cpu": "Intel(R) Core(TM) 7 240H",
+  "ram_gib": 15.7,
+  "timing_scope": "same project workstation; software prediction timing only",
+  "captured_for_paper_after_training": true
+}

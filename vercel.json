@@ -1,4 +1,29 @@
 {
-  "framework": null,
-  "buildCommand": null
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "style.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "script.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "posture-features.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "model-runtime.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "assets/**",
+      "use": "@vercel/static"
+    }
+  ]
 }

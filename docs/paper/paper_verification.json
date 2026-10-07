@@ -1,0 +1,32 @@
+{
+  "verified_at_utc": "2026-10-07T04:36:48.227906+00:00",
+  "checks": {
+    "author_matches_user": true,
+    "no_missing_glyph_boxes": true,
+    "all_font_resources_embedded": true,
+    "citation_targets_exist": true,
+    "reference_labels_exist": true,
+    "primary_metrics_match_artifacts": true,
+    "ablation_metrics_match_artifacts": true,
+    "quality_audit_matches": true,
+    "acknowledgment_removed": true,
+    "browser_parity_reported": true,
+    "explicit_research_contributions": true,
+    "full_project_and_demo_covered": true
+  },
+  "fonts": {
+    "/AAAAAA+TimesNewRomanPSMT": true,
+    "/AAAAAA+TimesNewRomanPS-BoldMT": true,
+    "/AAAAAA+TimesNewRomanPS-BoldItalicMT": true,
+    "/AAAAAA+TimesNewRomanPS-ItalicMT": true,
+    "/AAAAAA+CourierNewPSMT": true
+  },
+  "page_count": 7,
+  "bibliography_entries": 11,
+  "compiler_status": "Built-in compiler unavailable: Unable to find standard directories for platform",
+  "pdf_export": "ReportLab IEEE-style fallback, not verified IEEEtran compilation",
+  "sha256": {
+    "STAY_UPRIGHT_IEEE.tex": "b63a0b2e875024c720b93f83c85149b93927218cf0e7d40abeff01d07c07ed7a",
+    "STAY_UPRIGHT_IEEE.pdf": "4cf5ac72e0986e57ef438bdbafd400e7231f309114102c033c5a5c8d9f447af4"
+  }
+}

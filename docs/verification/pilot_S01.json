@@ -1,0 +1,45 @@
+{
+  "software_tests": 13,
+  "software_tests_passed": true,
+  "browser_contracts_passed": true,
+  "node_syntax_passed": true,
+  "server_metadata": {
+    "name": "Random_Forest",
+    "labels": [
+      "Correct",
+      "Slouch",
+      "Lean_Left",
+      "Lean_Right"
+    ],
+    "feature_version": "posture-head-shoulders-v2",
+    "evaluation_mode": "single-person pilot; deployment refit uses all recordings",
+    "pose_model_url": "/models/pose_landmarker_lite.task"
+  },
+  "deployed_model_api_checks": [
+    {
+      "row_id": "93afa20512e68ff86f7adc90",
+      "prompted": "Correct",
+      "prediction": "Correct",
+      "api_matches_python": true
+    },
+    {
+      "row_id": "b272e837e5b55d7deabcd4a9",
+      "prompted": "Slouch",
+      "prediction": "Slouch",
+      "api_matches_python": true
+    },
+    {
+      "row_id": "6ea9054211084c9c21dc05e8",
+      "prompted": "Lean_Left",
+      "prediction": "Lean_Left",
+      "api_matches_python": true
+    },
+    {
+      "row_id": "ee72af89f02392c6fcdace37",
+      "prompted": "Lean_Right",
+      "prediction": "Lean_Right",
+      "api_matches_python": true
+    }
+  ],
+  "camera_live_test": "not measured; webpage ready for webcam use"
+}

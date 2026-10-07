@@ -1,0 +1,48 @@
+{
+  "completed_at_utc": "2026-10-06T19:53:12.834054+00:00",
+  "scope": "S01 single-person head-and-shoulders pilot",
+  "deliverables": {
+    "dataset": "8 protocol videos",
+    "feature_extraction": "1930 observed frames, 21 shared geometric features",
+    "clean_dataset": "features_clean.csv plus review receipt",
+    "training": "Random Forest, RBF SVM and XGBoost trained and saved",
+    "evaluation": "968 video-disjoint held-out frames; per-class reports, confusions, prediction timings",
+    "comparison": "comparison.csv, comparison.png and baseline reports",
+    "deployment": "validation-selected Random Forest refit; loopback server on port 8000; browser integration"
+  },
+  "outstanding_for_full_study": [
+    "additional participants",
+    "exhaustive human ground-truth verification",
+    "subject-independent evaluation and between-subject variability",
+    "fresh live webcam performance measurement"
+  ],
+  "artifact_sha256": {
+    "baseline_metrics.json": "7979123c592138163a4ce872b85a99e62344cb6216750c9af3b2d119a4c2e5ac",
+    "baseline_predictions.csv": "974f319919dbef3c050905906440a4d2790652e3d47191d8a09951e5e58ac249",
+    "best_model.joblib": "876fcd6d8ef0d3066fe0a9650ea483849b15a86ce8d3fc592867a16783785625",
+    "comparison.csv": "90228cdf62dc3d409a59148e087b243b775527e204f1bb457b9b309dbea1177c",
+    "comparison.png": "be5609a620e33c65a32096e63d9633bedcd750713d8cca1651d2689c4c7d9f2f",
+    "directional_rule_4class.csv": "1451430e46153c82a5d65459f7185a13429c8d3129a8959d8ebef3ad2b2a4a28",
+    "directional_rule_4class.png": "6199fd2eabc2de94a54a8127d18ead862cee3d86e76f7950c077d81ee7fc0af9",
+    "experiment.json": "a603c276db8c11bf5dd941dbedc88a1f2c3962ed73306acdd065dd4254472e4e",
+    "original_rule_3state.csv": "ea0ef0463608e2d1030b47a90445c337237441a587d8e3f24e1c8f53e172cc19",
+    "original_rule_3state.png": "97210ebc775116f824f4a454fb5c6793a993ac9738680f42cbc26e28fd9c49c7",
+    "predictions.csv": "b05ee12936102537f4919b5ea7d289f0b94915ea3b946b2b8935afe19e6cd3ef",
+    "Random_Forest.joblib": "9c1c9034edd4a3260d01287efd7112f6ccebc130999df278424229b72f1a63a8",
+    "Random_Forest_confusion.csv": "cf547b8ff991e5aef6a72329e01434b6922167a18f7f615c3092c6588c20ce39",
+    "Random_Forest_confusion.png": "bdf70445ae59f21cd0beb63176c86d282be81264ff8f9572b2a0c509a1259459",
+    "Random_Forest_report.json": "5f91093060d39fe3822c60b962d9770abf8f5af9a718f8060b742d6a7251ac3c",
+    "REPORT.md": "997c0f6362a54abf76641d7f4f110048d98ea3e55b654be3973c9068a8f17cb7",
+    "selection.json": "8970da14c3f11771cb838853b3b561ee0b2810e09b935d90f1a3e461c1880694",
+    "split.json": "34f0f9a24e394abb52933127edbfbd6ed28f6f1c0200e3b5cc575657f8c7cd89",
+    "SVM_RBF.joblib": "ccbebacd402ca84419f3cdcfcf1dce88896703a7219d9768327c3e9767c95fb8",
+    "SVM_RBF_confusion.csv": "2a4859ffed60b8824105f897b8fd04c3173704e0e81bfe7383ded489761615a8",
+    "SVM_RBF_confusion.png": "97345f8d5c2ff3bc2336071b1dd46d3cd28c7c34642a251cad3e2cbf7aa760b7",
+    "SVM_RBF_report.json": "e51dbb96b611ba185f414dc91475fde60585f43888efafaaa2f51dac0fe7a1a1",
+    "verification.json": "9c680a6d81356425ac696e46fd3c92848409487f85b9e1551d7547a4ac4dba94",
+    "XGBoost.joblib": "556481deb4766004b34df4ed164cc5ae87752fddf4f61e0fcdf87efd1df82b0d",
+    "XGBoost_confusion.csv": "a67089d1fa197caf9e344f2e3dc6b4439f737bb07808b8c6ace7aa3561c3f602",
+    "XGBoost_confusion.png": "b0c92c29a474540c85316226bc75942ff6fd0021c6f91071a1b7f82c82ddc1fa",
+    "XGBoost_report.json": "7cdbca09eddfcc8839e15d0072a643c9f8bdfce44391668ceb7937387a657f0b"
+  }
+}

@@ -1,0 +1,9 @@
+subject_id,posture,video_path,start_seconds,end_seconds
+S01,Correct,S01/correct/S01_correct_02.mp4,5,53.733333333333334
+S01,Slouch,S01/slouch/S01_slouch_02.mp4,5,55.0
+S01,Lean_Left,S01/lean_left/S01_lean_left_02.mp4,5,55.0
+S01,Lean_Right,S01/lean_right/S01_lean_right_02.mp4,5,55.03333333333333
+S01,Correct,S01/correct/S01_correct_03.mp4,5,55.03333333333333
+S01,Slouch,S01/slouch/S01_slouch_03.mp4,5,55.0
+S01,Lean_Left,S01/lean_left/S01_lean_left_03.mp4,5,55.0
+S01,Lean_Right,S01/lean_right/S01_lean_right_03.mp4,5,55.03333333333333

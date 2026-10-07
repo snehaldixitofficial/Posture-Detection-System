@@ -1,0 +1,72 @@
+{
+  "accessed": "2026-10-07",
+  "references": [
+    {
+      "key": "mediapipe",
+      "title": "MediaPipe: A Framework for Building Perception Pipelines",
+      "url": "https://arxiv.org/abs/1906.08172",
+      "supported_claim": "Cross-platform perception framework"
+    },
+    {
+      "key": "blazepose",
+      "title": "BlazePose: On-device Real-time Body Pose Tracking",
+      "url": "https://arxiv.org/abs/2006.10204",
+      "supported_claim": "33-landmark pose estimation"
+    },
+    {
+      "key": "weightedrf",
+      "title": "Classification Algorithm for Sitting Postures Using Weighted Random Forest",
+      "url": "https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/ipr2.70126",
+      "supported_claim": "Prior frontal face/shoulder sitting-posture classification"
+    },
+    {
+      "key": "ml2sn",
+      "title": "ML-2SN: A Hybrid Two-Stream System for Sitting Posture Detection",
+      "url": "https://bmva-archive.org.uk/bmvc/2024/papers/Paper_510/paper.pdf",
+      "supported_claim": "Temporal/spatial skeleton method and occlusion discussion"
+    },
+    {
+      "key": "sitpose",
+      "title": "SitPose: Real-Time Detection of Sitting Posture and Sedentary Behavior Using Ensemble Learning With Depth Sensor",
+      "url": "https://arxiv.org/abs/2412.12216",
+      "supported_claim": "Kinect sensing and 36-participant dataset"
+    },
+    {
+      "key": "multiposture",
+      "title": "MultiPosture dataset",
+      "url": "https://zenodo.org/records/14230872",
+      "supported_claim": "13 participants and different upper/lower label taxonomy"
+    },
+    {
+      "key": "rf",
+      "title": "Random Forests",
+      "url": "https://doi.org/10.1023/A:1010933404324",
+      "supported_claim": "Established classifier"
+    },
+    {
+      "key": "svm",
+      "title": "Support-vector networks",
+      "url": "https://doi.org/10.1007/BF00994018",
+      "supported_claim": "Established classifier"
+    },
+    {
+      "key": "xgb",
+      "title": "XGBoost: A Scalable Tree Boosting System",
+      "url": "https://arxiv.org/abs/1603.02754",
+      "supported_claim": "Established classifier"
+    },
+    {
+      "key": "saeb",
+      "title": "The need to approximate the use-case in clinical machine learning",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5441397/",
+      "supported_claim": "Use-case-sensitive evaluation; publication indexed in primary article repository"
+    },
+    {
+      "key": "poseguide",
+      "title": "Pose landmark detection guide for Python",
+      "url": "https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker/python",
+      "supported_claim": "Coordinate semantics and VIDEO mode"
+    }
+  ],
+  "format_guidance": "https://conferences.ieeeauthorcenter.ieee.org/write-your-paper/authoring-tools-and-templates/"
+}

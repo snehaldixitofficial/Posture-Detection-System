@@ -10,3 +10,23 @@ venv/
 .pytest_cache/
 node_modules/
 .vercel/
+
+dataset/**/*.mp4
+dataset/**/*.avi
+dataset/**/*.mov
+dataset/**/*.webm
+models/*.task
+models/*.download
+data/research/
+data/session_*/
+results/
+dataset/session_*.json
+dataset/session_*.log
+
+# Temporary manuscript inspection outputs; final PDF, source and bundle are tracked.
+docs/paper/export_assets/
+docs/paper/*_extracted.txt
+docs/paper/pdf_extracted_check.txt
+docs/paper/latest_pdf_text.txt
+docs/paper/*review*.png
+docs/paper/updated_*.png

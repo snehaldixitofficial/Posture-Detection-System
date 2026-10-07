@@ -1,0 +1,49 @@
+test_video_api_and_no_pose_quality_rejection (test_pose_smoke.PoseSmokeTests.test_video_api_and_no_pose_quality_rejection) ... INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1791314117.385942   42304 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1791314117.414043   32212 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+ok
+blank_fixture.mp4: 0 accepted
+0 rows extracted; review videos and run qc before cleaning.
+
+S01 | Correct | take 1: Sit comfortably upright; center head and level shoulders.
+test_cancelling_stops_sequence (test_record_session.RecordingSessionTests.test_cancelling_stops_sequence) ... ok
+
+S01 | Correct | take 1: Sit comfortably upright; center head and level shoulders.
+
+S01 | Slouch | take 1: Round upper back; move head and neck forward.
+
+S01 | Lean_Left | take 1: Lean toward YOUR left side.
+
+S01 | Lean_Right | take 1: Lean toward YOUR right side.
+
+S01 | Correct | take 2: Sit comfortably upright; center head and level shoulders.
+
+S01 | Slouch | take 2: Round upper back; move head and neck forward.
+
+S01 | Lean_Left | take 2: Lean toward YOUR left side.
+
+S01 | Lean_Right | take 2: Lean toward YOUR right side.
+Session recorded in C:\Users\adils\AppData\Local\Temp\tmpcsitr95y\session_S01_20261006T191517Z.json. Human video/QC review is required before training.
+test_guided_session_preserves_all_class_and_take_labels (test_record_session.RecordingSessionTests.test_guided_session_preserves_all_class_and_take_labels) ... ok
+test_real_estimators_share_subject_folds_and_features (test_research.ExperimentTests.test_real_estimators_share_subject_folds_and_features) ... ok
+test_missing_and_bad_detection (test_research.FeatureTests.test_missing_and_bad_detection) ... ok
+test_normalization_and_contract (test_research.FeatureTests.test_normalization_and_contract) ... ok
+test_original_baseline_is_not_relabelled (test_research.FeatureTests.test_original_baseline_is_not_relabelled) ... ok
+test_unseen_lower_body_does_not_affect_head_shoulder_features (test_research.FeatureTests.test_unseen_lower_body_does_not_affect_head_shoulder_features) ... ok
+test_reviews_required_and_rejected_sample_quarantines_video (test_research.ReviewTests.test_reviews_required_and_rejected_sample_quarantines_video) ... ok
+test_metadata_predictions_and_quality_rejection (test_server.ServerTests.test_metadata_predictions_and_quality_rejection) ... 127.0.0.1 - - [07/Oct/2026 00:45:28] "GET /api/model HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 00:45:28] "GET / HTTP/1.1" 200 -
+ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 15.017s
+
+OK
+Fold 1/1 complete; held out ['S03']
+Results saved to C:\Users\adils\AppData\Local\Temp\tmp9t17azei\holdout. Deployment configuration selected by validation: Random_Forest
+Fold 1/3 complete; held out ['S01']
+Fold 2/3 complete; held out ['S02']
+Fold 3/3 complete; held out ['S03']
+Results saved to C:\Users\adils\AppData\Local\Temp\tmp9t17azei\loso. Deployment configuration selected by validation: Random_Forest
+Saved 7 reviewed rows to C:\Users\adils\AppData\Local\Temp\tmpe8mmvqwq\clean.csv; 1 videos quarantined.
+Open http://127.0.0.1:0; select Trained model. CTRL+C stops the server.
